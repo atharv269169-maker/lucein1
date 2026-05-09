@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpha1 — The Future of AI Projects</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020408; --bg2: #060d14;
+      --neon: #00f0ff; --neon2: #7b2fff; --neon3: #ff2f7b;
+      --text: #e8f4ff; --muted: #5a7a8a;
+      --card: rgba(0,240,255,0.04); --border: rgba(0,240,255,0.12);
+      --glow: 0 0 30px rgba(0,240,255,0.25);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow-x: hidden; cursor: none; }
+
+    #cursor { position: fixed; width: 10px; height: 10px; background: var(--neon); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); box-shadow: 0 0 15px var(--neon), 0 0 40px rgba(0,240,255,0.4); }
+    #cursor-ring { position: fixed; width: 34px; height: 34px; border: 1px solid rgba(0,240,255,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: left .1s ease, top .1s ease; }
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 6%; background: rgba(2,4,8,0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 1.25rem; color: var(--neon); text-shadow: 0 0 24px var(--neon); letter-spacing: 3px; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase; transition: color .3s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--neon); transition: width .3s; }
+    .nav-links a:hover { color: var(--neon); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 10px 22px; font-family: 'Orbitron', monospace; font-size: 0.72rem; letter-spacing: 2px; cursor: none; transition: all .3s; text-decoration: none; text-transform: uppercase; }
+    .nav-cta:hover { background: var(--neon); color: var(--bg); box-shadow: var(--glow); }
+
+    #hero { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 6% 80px; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+    .orb1 { width: 500px; height: 500px; background: rgba(0,240,255,0.06); top: -100px; left: -150px; animation: float 8s ease-in-out infinite; }
+    .orb2 { width: 400px; height: 400px; background: rgba(123,47,255,0.07); bottom: 0; right: -100px; animation: float 10s ease-in-out infinite reverse; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 4px; color: var(--neon); text-transform: uppercase; border: 1px solid rgba(0,240,255,0.2); padding: 7px 20px; margin-bottom: 36px; background: rgba(0,240,255,0.04); animation: fadeUp .8s ease both; position: relative; z-index: 1; }
+    .badge-dot { width: 6px; height: 6px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 8px var(--neon); animation: blink 1.5s infinite; }
+    .hero-title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(3rem, 9vw, 8rem); line-height: 1.0; margin-bottom: 8px; animation: fadeUp .8s .15s ease both; position: relative; z-index: 1; }
+    .hero-title .line1 { display: block; color: var(--text); letter-spacing: 4px; }
+    .hero-title .line2 { display: block; background: linear-gradient(90deg, var(--neon), var(--neon2), var(--neon3), var(--neon)); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 4s linear infinite; }
+    .hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 540px; line-height: 1.75; margin: 28px auto 52px; animation: fadeUp .8s .3s ease both; position: relative; z-index: 1; }
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; animation: fadeUp .8s .45s ease both; position: relative; z-index: 1; }
+    .btn-primary { background: var(--neon); color: var(--bg); border: none; padding: 16px 40px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.82rem; letter-spacing: 2px; cursor: none; text-transform: uppercase; transition: all .3s; text-decoration: none; display: inline-block; position: relative; overflow: hidden; }
+    .btn-primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: translateX(-100%); transition: transform .5s; }
+    .btn-primary:hover::after { transform: translateX(100%); }
+    .btn-primary:hover { box-shadow: 0 0 40px rgba(0,240,255,0.7); transform: translateY(-2px); }
+    .btn-secondary { background: transparent; border: 1px solid rgba(0,240,255,0.3); color: var(--text); padding: 16px 40px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.82rem; letter-spacing: 2px; cursor: none; text-transform: uppercase; transition: all .3s; text-decoration: none; display: inline-block; }
+    .btn-secondary:hover { border-color: var(--neon); color: var(--neon); box-shadow: var(--glow); }
+    .hero-stats { display: flex; gap: 70px; margin-top: 80px; animation: fadeUp .8s .6s ease both; position: relative; z-index: 1; }
+    .stat { text-align: center; }
+    .stat-num { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight: 900; color: var(--neon); text-shadow: 0 0 24px var(--neon); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 2px; margin-top: 6px; text-transform: uppercase; }
+    .scroll-hint { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; animation: fadeUp 1s 1.2s ease both; z-index: 1; }
+    .scroll-hint span { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+    .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--neon), transparent); animation: scrollPulse 2s infinite; }
+
+    .marquee-strip { background: rgba(0,240,255,0.04); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 0; overflow: hidden; position: relative; z-index: 1; }
+    .marquee-track { display: flex; gap: 60px; animation: marquee 22s linear infinite; white-space: nowrap; width: max-content; }
+    .marquee-item { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; display: inline-flex; align-items: center; gap: 16px; }
+    .marquee-item span { color: var(--neon); }
+
+    section { position: relative; z-index: 1; padding: 110px 6%; }
+    .section-tag { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 4px; color: var(--neon); text-transform: uppercase; margin-bottom: 18px; display: block; }
+    .section-title { font-family: 'Orbitron', monospace; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; line-height: 1.2; margin-bottom: 20px; }
+    .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.75; max-width: 580px; }
+
+    #features { background: var(--bg2); }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 60px; }
+
+    /* === 3D CARD STYLES === */
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); padding: 36px 28px;
+      position: relative; overflow: hidden;
+      transition: box-shadow .4s, border-color .4s;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--neon), var(--neon2)); transform: scaleX(0); transform-origin: left; transition: transform .4s; }
+    .feature-card:hover { border-color: rgba(0,240,255,0.4); box-shadow: 0 20px 60px rgba(0,240,255,0.15), 0 0 0 1px rgba(0,240,255,0.1); }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card.expanded { border-color: rgba(0,240,255,0.5); box-shadow: 0 24px 70px rgba(0,240,255,0.2); }
+    .feature-card.expanded::before { transform: scaleX(1); }
+
+    .feature-icon { font-size: 2.2rem; margin-bottom: 20px; display: block; filter: drop-shadow(0 0 8px rgba(0,240,255,0.5)); }
+    .feature-num { position: absolute; top: 20px; right: 24px; font-family: 'Orbitron', monospace; font-size: 0.65rem; color: rgba(0,240,255,0.18); font-weight: 900; }
+    .feature-title { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+    .feature-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
+
+    /* expand arrow */
+    .feature-arrow { display: block; margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 2px; color: rgba(0,240,255,0.4); transition: color .3s; }
+    .feature-card:hover .feature-arrow, .feature-card.expanded .feature-arrow { color: var(--neon); }
+    .feature-arrow span { display: inline-block; transition: transform .3s; }
+    .feature-card.expanded .feature-arrow span { transform: rotate(180deg); }
+
+    /* expand content */
+    .feature-expand { max-height: 0; overflow: hidden; transition: max-height .5s ease, opacity .4s ease; opacity: 0; }
+    .feature-card.expanded .feature-expand { max-height: 200px; opacity: 1; }
+    .feature-expand-inner { border-top: 1px solid rgba(0,240,255,0.1); margin-top: 16px; padding-top: 16px; color: #8aaabb; font-size: 0.85rem; line-height: 1.75; }
+    /* === END 3D CARD STYLES === */
+
+    #testimonials { background: var(--bg); }
+    .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 60px; }
+    .testi-card {
+      background: var(--card); padding: 32px 28px; position: relative;
+      transition: transform .35s, box-shadow .35s;
+      border: 1px solid transparent;
+      overflow: hidden;
+    }
+    .testi-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 24px 60px rgba(123,47,255,0.18); }
+    /* laser SVG border overlay */
+    .testi-card .laser-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+    .stars { color: var(--neon); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 16px; }
+    .testi-text { font-size: 0.95rem; line-height: 1.75; color: var(--text); margin-bottom: 24px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 14px; }
+    .testi-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--neon), var(--neon2)); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', monospace; font-weight: 900; font-size: 0.78rem; color: var(--bg); flex-shrink: 0; }
+    .testi-name { font-weight: 700; font-size: 0.9rem; }
+    .testi-role { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+
+    /* === THANK YOU MODAL === */
+    #ty-modal {
+      display: none; position: fixed; inset: 0; z-index: 9000;
+      background: rgba(2,4,8,0.95); backdrop-filter: blur(16px);
+      align-items: center; justify-content: center; flex-direction: column;
+      text-align: center;
+    }
+    #ty-modal.show { display: flex; animation: fadeUp .5s ease; }
+    #ty-canvas { position: absolute; inset: 0; pointer-events: none; }
+    .ty-inner { position: relative; z-index: 1; max-width: 520px; padding: 0 2rem; }
+    .ty-icon { font-size: 4rem; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; display: block; }
+    .ty-title { font-family: 'Orbitron', monospace; font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; margin-bottom: 1rem; background: linear-gradient(90deg, var(--neon), var(--neon2), var(--neon3), var(--neon)); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 3s linear infinite; }
+    .ty-sub { font-size: 1rem; color: var(--muted); line-height: 1.75; margin-bottom: 2rem; }
+    .ty-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 3px; color: var(--neon); border: 1px solid rgba(0,240,255,0.25); padding: 8px 20px; background: rgba(0,240,255,0.05); margin-bottom: 2rem; }
+    .ty-close { background: transparent; border: 1px solid rgba(0,240,255,0.3); color: var(--neon); padding: 12px 32px; font-family: 'Orbitron', monospace; font-size: 0.72rem; letter-spacing: 2px; cursor: none; text-transform: uppercase; transition: all .3s; }
+    .ty-close:hover { background: var(--neon); color: var(--bg); box-shadow: var(--glow); }
+
+    #waitlist { background: var(--bg2); text-align: center; }
+    #waitlist::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,240,255,0.04), transparent 70%); pointer-events: none; }
+    .waitlist-box { max-width: 560px; margin: 0 auto; position: relative; z-index: 1; }
+    .waitlist-count { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--neon); margin-bottom: 10px; }
+    .waitlist-form { display: flex; margin-top: 36px; border: 1px solid var(--border); transition: border-color .3s, box-shadow .3s; }
+    .waitlist-form:focus-within { border-color: var(--neon); box-shadow: var(--glow); }
+    .waitlist-form input { flex: 1; background: transparent; border: none; outline: none; padding: 18px 22px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.95rem; }
+    .waitlist-form input::placeholder { color: var(--muted); }
+    .waitlist-form button { background: var(--neon); color: var(--bg); border: none; padding: 18px 28px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.72rem; letter-spacing: 2px; cursor: none; text-transform: uppercase; transition: all .3s; white-space: nowrap; }
+    .waitlist-form button:hover { box-shadow: var(--glow); }
+    .waitlist-note { font-size: 0.72rem; color: var(--muted); margin-top: 14px; letter-spacing: 1px; }
+    #waitlist-success { display: none; margin-top: 20px; color: var(--neon); font-family: 'Space Mono', monospace; font-size: 0.82rem; letter-spacing: 2px; }
+
+    #about { background: var(--bg); }
+    .about-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-visual { position: relative; display: flex; align-items: center; justify-content: center; }
+    .about-ring-outer { width: 280px; height: 280px; border-radius: 50%; border: 1px solid rgba(0,240,255,0.15); display: flex; align-items: center; justify-content: center; position: relative; animation: rotate 25s linear infinite; }
+    .about-ring-inner { width: 210px; height: 210px; border-radius: 50%; border: 1px solid rgba(123,47,255,0.2); display: flex; align-items: center; justify-content: center; animation: rotate 15s linear infinite reverse; }
+    .about-avatar-big { width: 160px; height: 160px; border-radius: 50%; background: linear-gradient(135deg, var(--neon), var(--neon2)); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: var(--bg); animation: rotate 25s linear infinite; box-shadow: 0 0 40px rgba(0,240,255,0.3); }
+    .orbit-dot { position: absolute; width: 10px; height: 10px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 12px var(--neon); top: -5px; left: 50%; transform: translateX(-50%); }
+    .orbit-dot2 { position: absolute; width: 7px; height: 7px; background: var(--neon2); border-radius: 50%; box-shadow: 0 0 10px var(--neon2); bottom: -4px; right: 20%; }
+    .about-content p { color: var(--muted); line-height: 1.85; margin-bottom: 20px; }
+    .about-content strong { color: var(--neon); }
+
+    footer { position: relative; z-index: 1; background: var(--bg2); border-top: 1px solid var(--border); padding: 36px 6%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .footer-logo { font-family: 'Orbitron', monospace; font-weight: 900; color: var(--neon); font-size: 1rem; letter-spacing: 3px; }
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 1px; transition: color .2s; }
+    .footer-links a:hover { color: var(--neon); }
+
+    #chat-btn { position: fixed; bottom: 32px; right: 32px; z-index: 200; width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, var(--neon2), var(--neon)); border: none; cursor: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(0,240,255,0.4); transition: all .3s; font-size: 1.4rem; }
+    #chat-btn:hover { transform: scale(1.12); box-shadow: 0 0 50px rgba(0,240,255,0.7); }
+    .chat-ping { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; background: #00ff88; border-radius: 50%; border: 2px solid var(--bg); animation: blink 2s infinite; }
+
+    #chat-window { position: fixed; bottom: 104px; right: 32px; z-index: 200; width: 370px; height: 500px; background: #060d14; border: 1px solid var(--border); display: none; flex-direction: column; box-shadow: 0 0 60px rgba(0,240,255,0.12); overflow: hidden; }
+    #chat-window.open { display: flex; animation: slideUp .3s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .chat-header { background: linear-gradient(90deg, rgba(0,240,255,0.07), rgba(123,47,255,0.07)); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+    .chat-header-left { display: flex; align-items: center; gap: 12px; }
+    .chat-dot { width: 7px; height: 7px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88; animation: blink 2s infinite; }
+    .chat-title { font-family: 'Orbitron', monospace; font-size: 0.82rem; font-weight: 700; color: var(--neon); }
+    .chat-subtitle { font-size: 0.6rem; color: var(--muted); margin-top: 2px; letter-spacing: 1px; }
+    .chat-close { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: none; transition: color .2s; padding: 4px; }
+    .chat-close:hover { color: var(--text); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .msg { max-width: 82%; padding: 11px 15px; font-size: 0.84rem; line-height: 1.55; }
+    .msg.bot { background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.12); align-self: flex-start; color: var(--text); border-radius: 0 10px 10px 10px; animation: fadeUp .3s ease; }
+    .msg.user { background: linear-gradient(135deg, var(--neon2), #5a1fbf); align-self: flex-end; color: white; border-radius: 10px 0 10px 10px; animation: fadeUp .3s ease; }
+    .msg.typing { color: var(--muted); font-style: italic; font-size: 0.78rem; }
+    .quick-btns { display: flex; flex-wrap: wrap; gap: 7px; padding: 10px 14px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    .qbtn { background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.18); color: var(--neon); font-size: 0.68rem; padding: 6px 11px; cursor: none; transition: all .2s; letter-spacing: 1px; font-family: 'Space Mono', monospace; }
+    .qbtn:hover { background: rgba(0,240,255,0.14); border-color: var(--neon); transform: translateY(-1px); }
+    .chat-input-area { border-top: 1px solid var(--border); display: flex; align-items: center; }
+    #chat-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); padding: 15px 18px; font-family: 'Syne', sans-serif; font-size: 0.84rem; }
+    #chat-input::placeholder { color: var(--muted); }
+    #chat-send { background: transparent; border: none; border-left: 1px solid var(--border); color: var(--neon); padding: 15px 18px; font-size: 1rem; cursor: none; transition: all .2s; }
+    #chat-send:hover { background: rgba(0,240,255,0.08); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scrollPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.15; } }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-18px); } }
+    @keyframes gradientShift { 0% { background-position: 0%; } 100% { background-position: 200%; } }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero-stats { gap: 28px; flex-wrap: wrap; justify-content: center; }
+      .about-inner { grid-template-columns: 1fr; }
+      .about-visual { order: -1; }
+      #chat-window { width: calc(100vw - 40px); right: 20px; }
+      .waitlist-form { flex-direction: column; }
+      .footer-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <span class="nav-logo">ALPHA1</span>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+</nav>
+
+<section id="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="hero-badge"><span class="badge-dot"></span>Next-Gen AI Platform — Launching Soon</div>
+  <h1 class="hero-title">
+    <span class="line1">WELCOME TO</span>
+    <span class="line2">ALPHA1</span>
+  </h1>
+  <p class="hero-sub">The future of AI-powered projects is here. Smarter workflows, faster execution, and intelligence that actually understands you.</p>
+  <div class="hero-btns">
+    <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+    <a href="#features" class="btn-secondary">Explore Features</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" data-count="500">0</div><div class="stat-label">Early Signups</div></div>
+    <div class="stat"><div class="stat-num" data-count="12">0</div><div class="stat-label">AI Models</div></div>
+    <div class="stat"><div class="stat-num" data-count="99">0</div><div class="stat-label">% Uptime</div></div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <div class="marquee-item">Adaptive AI <span>✦</span></div>
+    <div class="marquee-item">Real-Time Intelligence <span>✦</span></div>
+    <div class="marquee-item">Privacy First <span>✦</span></div>
+    <div class="marquee-item">Lightning Fast <span>✦</span></div>
+    <div class="marquee-item">No-Code Automation <span>✦</span></div>
+    <div class="marquee-item">One-Click Deploy <span>✦</span></div>
+    <div class="marquee-item">Adaptive AI <span>✦</span></div>
+    <div class="marquee-item">Real-Time Intelligence <span>✦</span></div>
+    <div class="marquee-item">Privacy First <span>✦</span></div>
+    <div class="marquee-item">Lightning Fast <span>✦</span></div>
+    <div class="marquee-item">No-Code Automation <span>✦</span></div>
+    <div class="marquee-item">One-Click Deploy <span>✦</span></div>
+  </div>
+</div>
+
+<section id="features">
+  <span class="section-tag reveal">// Core Capabilities</span>
+  <h2 class="section-title reveal">Built Different.<br/>Built for <span style="color:var(--neon)">Tomorrow.</span></h2>
+  <p class="section-sub reveal">Alpha1 combines cutting-edge AI with an intuitive interface to give you superpowers you never thought possible.</p>
+  <div class="features-grid">
+
+    <div class="feature-card reveal">
+      <span class="feature-num">01</span>
+      <span class="feature-icon">🧠</span>
+      <div class="feature-title">Adaptive AI Engine</div>
+      <div class="feature-desc">Our AI learns your patterns and adapts in real time — giving smarter responses the more you use it.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Alpha1's core engine continuously monitors how you work — your prompts, your preferences, your workflows. Over time it builds a personal model of you, delivering responses that feel tailor-made. The more you use it, the smarter it gets. No retraining, no configuration — just intelligence that evolves with you automatically.</div></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">02</span>
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">Lightning Execution</div>
+      <div class="feature-desc">Zero latency workflows. Your ideas go from thought to output in milliseconds, not minutes.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Alpha1 is built on a globally distributed inference network with sub-50ms response times. Our pipeline eliminates queue delays using predictive pre-loading. Whether you're running a quick prompt or a complex multi-step automation, you get results before you've even finished thinking. Speed isn't a feature — it's the foundation.</div></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">03</span>
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">Privacy First</div>
+      <div class="feature-desc">End-to-end encrypted. Your data is yours alone. We never train on your inputs without consent.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Every request is encrypted end-to-end using AES-256 and never persisted on our servers beyond your session. We operate under a strict zero-training policy — your inputs are never used to improve our models without your explicit consent. Built to be fully GDPR, CCPA, and SOC 2 Type II compliant from day one.</div></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">04</span>
+      <span class="feature-icon">🌐</span>
+      <div class="feature-title">Real-Time Web Intel</div>
+      <div class="feature-desc">Connected to live data streams. Alpha1 knows what's happening right now, not just what it was trained on.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Unlike static AI models stuck at a training cutoff, Alpha1 maintains live connections to thousands of real-time data sources — news, markets, research papers, and social signals. When you ask a question, you get an answer grounded in what's happening right now, not six months ago. Real-time intelligence for a real-time world.</div></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">05</span>
+      <span class="feature-icon">🎯</span>
+      <div class="feature-title">Precision Automation</div>
+      <div class="feature-desc">Build complex automations with natural language. No code needed — just describe what you want.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Describe your workflow in plain language and Alpha1 constructs, tests, and deploys a fully functional automation pipeline. Connect it to Slack, Notion, Google Workspace, GitHub, and 200+ more tools. Conditional logic, multi-step triggers, error handling — all handled automatically. What used to take a developer days now takes you minutes.</div></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">06</span>
+      <span class="feature-icon">🚀</span>
+      <div class="feature-title">One-Click Deploy</div>
+      <div class="feature-desc">Push your AI projects live instantly. From idea to production with a single click.</div>
+      <span class="feature-arrow">▼ <span>▼</span> LEARN MORE</span>
+      <div class="feature-expand"><div class="feature-expand-inner">Alpha1 manages your entire deployment infrastructure — serverless functions, scaling, CDN distribution, and uptime monitoring — all behind a single button. Deploy your AI project globally in under 10 seconds. No DevOps knowledge required. Automatic rollbacks, zero-downtime updates, and real-time analytics included out of the box.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<section id="testimonials">
+  <span class="section-tag reveal">// Early Access Feedback</span>
+  <h2 class="section-title reveal">People Are <span style="color:var(--neon2)">Talking.</span></h2>
+  <p class="section-sub reveal">Beta testers are already calling Alpha1 the most powerful AI platform they've ever used.</p>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <svg class="laser-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect class="laser-rect" x="0.5" y="0.5" width="99" height="99" fill="none" stroke="url(#lg1)" stroke-width="1.5"/><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00f0ff"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient></defs></svg>
+      <div class="stars">★★★★★</div><div class="testi-text">"I've tried every AI tool out there. Alpha1 is on a completely different level. It feels like the future, today."</div><div class="testi-author"><div class="testi-avatar">RK</div><div><div class="testi-name">Rahul Kumar</div><div class="testi-role">Software Engineer, Bangalore</div></div></div>
+    </div>
+    <div class="testi-card reveal">
+      <svg class="laser-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect class="laser-rect" x="0.5" y="0.5" width="99" height="99" fill="none" stroke="url(#lg2)" stroke-width="1.5"/><defs><linearGradient id="lg2" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff2f7b"/><stop offset="100%" stop-color="#00f0ff"/></linearGradient></defs></svg>
+      <div class="stars">★★★★★</div><div class="testi-text">"The speed, the accuracy, the UI — everything is next level. I'm never going back to the old tools."</div><div class="testi-author"><div class="testi-avatar">PS</div><div><div class="testi-name">Priya Sharma</div><div class="testi-role">Product Manager, Mumbai</div></div></div>
+    </div>
+    <div class="testi-card reveal">
+      <svg class="laser-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect class="laser-rect" x="0.5" y="0.5" width="99" height="99" fill="none" stroke="url(#lg3)" stroke-width="1.5"/><defs><linearGradient id="lg3" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#7b2fff"/><stop offset="100%" stop-color="#ff2f7b"/></linearGradient></defs></svg>
+      <div class="stars">★★★★★</div><div class="testi-text">"Alpha1 automated 3 hours of my daily work in the first week. Atharv is building something insane here."</div><div class="testi-author"><div class="testi-avatar">AV</div><div><div class="testi-name">Arjun Verma</div><div class="testi-role">Startup Founder, Delhi</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="waitlist">
+  <div class="waitlist-box reveal">
+    <span class="section-tag">// Exclusive Access</span>
+    <div class="waitlist-count">🔥 <span id="wl-count">247</span> people joined in the last 24 hours</div>
+    <h2 class="section-title">Be First.<br/><span style="color:var(--neon)">Join the Waitlist.</span></h2>
+    <p class="section-sub" style="margin:0 auto">Get early access, founding member perks, and a lifetime discount. Limited spots available.</p>
+    <div class="waitlist-form">
+      <input type="email" id="email-input" placeholder="Enter your email address" />
+      <button onclick="joinWaitlist()">Join Now</button>
+    </div>
+    <p class="waitlist-note">🔒 No spam. Ever. Unsubscribe anytime.</p>
+    <div id="waitlist-success">✅ You're on the list! We'll be in touch soon. 🚀</div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about-inner">
+    <div class="about-content reveal">
+      <span class="section-tag">// The Founder</span>
+      <h2 class="section-title">Built with<br/><span style="color:var(--neon)">Purpose.</span></h2>
+      <p>Hi, I'm <strong>Atharv Sahu</strong> — CEO & Founder of Alpha1. I started this with one goal: to build AI tools that actually solve real problems, not just demo well.</p>
+      <p>We're in pre-launch, validating hard, listening to real users, and building something that will genuinely change how people work with AI.</p>
+      <p>This isn't just a startup. <strong>This is the future.</strong></p>
+      <a href="#waitlist" class="btn-primary" style="margin-top:12px;display:inline-block">Get Early Access →</a>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-ring-outer">
+        <div class="orbit-dot"></div>
+        <div class="about-ring-inner">
+          <div class="orbit-dot2"></div>
+          <div class="about-avatar-big">AS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THANK YOU MODAL -->
+<div id="ty-modal">
+  <canvas id="ty-canvas"></canvas>
+  <div class="ty-inner">
+    <span class="ty-icon">🚀</span>
+    <div class="ty-title">YOU'RE IN!</div>
+    <div class="ty-badge"><span class="badge-dot"></span> FOUNDING MEMBER SECURED</div>
+    <p class="ty-sub">Welcome to the future, <strong id="ty-name" style="color:var(--neon)">pioneer</strong>. You're now on the Alpha1 waitlist.<br/>We'll hit you up the moment we launch. Get ready.</p>
+    <button class="ty-close" onclick="closeTy()">← BACK TO SITE</button>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">ALPHA1</span>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="#waitlist">Waitlist</a>
+    <a href="#about">About</a>
+  </div>
+  <span class="footer-copy">© 2025 Alpha1 · Built by Atharv Sahu</span>
+</footer>
+
+<button id="chat-btn" onclick="toggleChat()" title="Chat with us">💬<div class="chat-ping"></div></button>
+
+<div id="chat-window">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-dot"></div>
+      <div>
+        <div class="chat-title">ALPHA1 SUPPORT</div>
+        <div class="chat-subtitle">Always online • Instant answers</div>
+      </div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="quick-btns" id="quick-btns"></div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Ask anything about Alpha1..." onkeydown="if(event.key==='Enter') sendChat()" />
+    <button id="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script>
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+  setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 90);
+});
+
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, pts = [];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+for (let i = 0; i < 120; i++) pts.push({ x: Math.random()*3000, y: Math.random()*3000, r: Math.random()*1.4+0.2, vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.25, a: Math.random()*.4+0.08 });
+(function draw() {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,240,255,${p.a})`; ctx.fill();
+  });
+  ctx.strokeStyle='rgba(0,240,255,0.025)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=90){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=90){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  requestAnimationFrame(draw);
+})();
+
+document.querySelectorAll('.reveal').forEach(el => {
+  new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting) el.classList.add('visible'); }); }, {threshold:0.1}).observe(el);
+});
+
+document.querySelectorAll('[data-count]').forEach(el => {
+  new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      const target = +el.dataset.count; let cur = 0; const step = target/60;
+      const t = setInterval(() => {
+        cur += step;
+        if(cur >= target){el.textContent = target+(target===99?'%':'+');clearInterval(t);}
+        else el.textContent = Math.floor(cur)+(target===99?'%':'+');
+      }, 18);
+    });
+  }, {threshold:0.5}).observe(el);
+});
+
+let wlCount = 247;
+setInterval(() => { if(Math.random()>.7){wlCount++;const e=document.getElementById('wl-count');if(e)e.textContent=wlCount;} }, 9000);
+
+function joinWaitlist() {
+  const emailEl = document.getElementById('email-input');
+  const email = emailEl.value;
+  if(!email||!email.includes('@')){emailEl.style.outline='1px solid #ff2f7b';setTimeout(()=>emailEl.style.outline='',1200);return;}
+  // show thank you modal
+  const name = email.split('@')[0];
+  document.getElementById('ty-name').textContent = name;
+  document.getElementById('ty-modal').classList.add('show');
+  emailEl.value = '';
+  wlCount++;const e=document.getElementById('wl-count');if(e)e.textContent=wlCount;
+  startTyParticles();
+}
+function closeTy() { document.getElementById('ty-modal').classList.remove('show'); stopTyParticles(); }
+
+// Thank you modal particle burst
+let tyAnim = null, tyPts = [];
+function startTyParticles() {
+  const c = document.getElementById('ty-canvas');
+  const cx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  tyPts = [];
+  for(let i=0;i<120;i++) tyPts.push({
+    x: c.width/2, y: c.height/2,
+    vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+    r: Math.random()*3+1, a: 1,
+    color: ['#00f0ff','#7b2fff','#ff2f7b','#00ff88'][Math.floor(Math.random()*4)]
+  });
+  function frame() {
+    cx.clearRect(0,0,c.width,c.height);
+    tyPts.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.a-=0.008;
+      cx.globalAlpha=Math.max(0,p.a);
+      cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      cx.fillStyle=p.color; cx.shadowBlur=12; cx.shadowColor=p.color; cx.fill();
+    });
+    cx.globalAlpha=1; cx.shadowBlur=0;
+    // continuous floating particles
+    if(Math.random()>0.6) tyPts.push({
+      x: Math.random()*c.width, y: c.height+10,
+      vx: (Math.random()-0.5)*1.5, vy: -(Math.random()*2+1),
+      r: Math.random()*2+0.5, a: 0.8,
+      color: ['#00f0ff','#7b2fff','#ff2f7b'][Math.floor(Math.random()*3)]
+    });
+    tyPts = tyPts.filter(p=>p.a>0);
+    tyAnim = requestAnimationFrame(frame);
+  }
+  frame();
+}
+function stopTyParticles() { if(tyAnim) cancelAnimationFrame(tyAnim); }
+
+/* === NEON LASER BORDER on feature cards + testi cards === */
+function initLaserCard(card, colors) {
+  const cvs = document.createElement('canvas');
+  cvs.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:10;';
+  card.style.position = 'relative';
+  card.style.overflow = 'visible';
+  card.appendChild(cvs);
+
+  function syncSize() {
+    cvs.width = card.offsetWidth;
+    cvs.height = card.offsetHeight;
+    cvs.style.width = card.offsetWidth + 'px';
+    cvs.style.height = card.offsetHeight + 'px';
+  }
+
+  let prog = 0, animId = null;
+
+  function draw() {
+    syncSize();
+    const W = cvs.width, H = cvs.height;
+    const cx = cvs.getContext('2d');
+    cx.clearRect(0,0,W,H);
+
+    // total perimeter
+    const perim = 2*(W+H);
+    // beam head position
+    const head = prog * perim;
+    // beam tail (trailing 18% of perimeter)
+    const tailLen = perim * 0.18;
+
+    // draw beam as a series of short segments with gradient opacity
+    const steps = 80;
+    for(let i=0;i<steps;i++) {
+      const t = i/steps;
+      const pos = ((head - tailLen*(1-t)) % perim + perim) % perim;
+      const pt = perimPt(pos, W, H);
+      const alpha = t * 0.9;
+      cx.beginPath(); cx.arc(pt.x, pt.y, 1.8, 0, Math.PI*2);
+      cx.fillStyle = lerpColor(colors[0], colors[1], t, alpha);
+      cx.shadowBlur = 8; cx.shadowColor = colors[0];
+      cx.fill();
+    }
+    // bright head dot
+    const hp = perimPt(head % perim, W, H);
+    cx.beginPath(); cx.arc(hp.x, hp.y, 3, 0, Math.PI*2);
+    cx.fillStyle = colors[0]; cx.shadowBlur = 20; cx.shadowColor = colors[0]; cx.fill();
+    cx.shadowBlur = 0;
+
+    // dim border always
+    cx.strokeStyle = 'rgba(0,240,255,0.08)'; cx.lineWidth = 1;
+    cx.strokeRect(0.5,0.5,W-1,H-1);
+  }
+
+  function loop() {
+    prog += 0.006;
+    if(prog > 1) prog = 0;
+    draw();
+    animId = requestAnimationFrame(loop);
+  }
+
+  card.addEventListener('mouseenter', () => { if(!animId) loop(); });
+  card.addEventListener('mouseleave', () => {
+    if(animId){ cancelAnimationFrame(animId); animId=null; }
+    syncSize();
+    const cx = cvs.getContext('2d');
+    cx.clearRect(0,0,cvs.width,cvs.height);
+    cx.strokeStyle='rgba(0,240,255,0.12)'; cx.lineWidth=1;
+    cx.strokeRect(0.5,0.5,cvs.width-1,cvs.height-1);
+  });
+  // default border after layout
+  requestAnimationFrame(()=>{ syncSize(); const cx=cvs.getContext('2d'); cx.strokeStyle='rgba(0,240,255,0.12)'; cx.lineWidth=1; cx.strokeRect(0.5,0.5,cvs.width-1,cvs.height-1); });
+}
+
+function perimPt(d, W, H) {
+  if(d < W) return {x:d, y:0};
+  d-=W; if(d < H) return {x:W, y:d};
+  d-=H; if(d < W) return {x:W-d, y:H};
+  d-=W; return {x:0, y:H-d};
+}
+
+function lerpColor(c1, c2, t, alpha) {
+  const p = (h) => parseInt(h,16);
+  const r1=p(c1.slice(1,3)),g1=p(c1.slice(3,5)),b1=p(c1.slice(5,7));
+  const r2=p(c2.slice(1,3)),g2=p(c2.slice(3,5)),b2=p(c2.slice(5,7));
+  return `rgba(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)},${alpha})`;
+}
+
+document.querySelectorAll('.feature-card').forEach((card,i) => {
+  const palettes = [['#00f0ff','#7b2fff'],['#7b2fff','#ff2f7b'],['#ff2f7b','#00f0ff'],['#00f0ff','#7b2fff'],['#7b2fff','#00f0ff'],['#00f0ff','#ff2f7b']];
+  card.style.border = 'none';
+  initLaserCard(card, palettes[i % palettes.length]);
+
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(800px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) translateY(-8px)`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+
+  // single click expand — toggle
+  let downTime = 0;
+  card.addEventListener('pointerdown', () => { downTime = Date.now(); });
+  card.addEventListener('pointerup', () => {
+    if(Date.now() - downTime > 300) return; // ignore long press/drag
+    const isOpen = card.classList.contains('expanded');
+    document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('expanded'));
+    if (!isOpen) card.classList.add('expanded');
+  });
+});
+
+document.querySelectorAll('.testi-card').forEach((card,i) => {
+  const palettes = [['#00f0ff','#7b2fff'],['#ff2f7b','#00f0ff'],['#7b2fff','#ff2f7b']];
+  card.style.border = 'none';
+  // remove inline svg we added in HTML (used canvas instead)
+  const svg = card.querySelector('.laser-svg'); if(svg) svg.remove();
+  initLaserCard(card, palettes[i % palettes.length]);
+});
+/* === END LASER === */
+
+const faqs = [
+  {keys:['what is alpha','about alpha','tell me','kya hai','alpha1 kya'],ans:"Alpha1 is a next-gen AI platform founded by Atharv Sahu. We're building smarter workflows, automation tools, and AI-powered apps — all in one place. 🚀"},
+  {keys:['launch','release','when','kab','launch date'],ans:"We're in pre-launch right now! Join the waitlist to get early access and founding member perks before anyone else. ⚡"},
+  {keys:['waitlist','join','signup','sign up','early access'],ans:"Scroll down to the waitlist section and drop your email! Early members get lifetime discounts and exclusive founding perks. 🎯"},
+  {keys:['free','price','cost','paid','kitna','pricing'],ans:"Alpha1 will have a generous free tier plus premium plans. Early waitlist members get special discounted pricing at launch! 💰"},
+  {keys:['feature','capabilities','what can','kya kya'],ans:"Alpha1 features adaptive AI, lightning-fast execution, real-time web intelligence, privacy-first design, automation, and one-click deployment. 🔥"},
+  {keys:['founder','atharv','ceo','who made','kisne','who built'],ans:"Alpha1 is built by Atharv Sahu — CEO & Founder. His vision is to make powerful AI tools accessible to everyone. 👨‍💻"},
+  {keys:['contact','email','reach','connect','support'],ans:"Join the waitlist and we'll be in touch! Full contact details coming with our official launch. 📬"},
+  {keys:['safe','secure','privacy','data','encrypted'],ans:"Your data is 100% yours. Alpha1 uses end-to-end encryption and never trains on your data without consent. 🔒"},
+  {keys:['hi','hello','hey','hii','helo','namaste','yo','sup','wassup'],ans:"Hey there! 👋 Welcome to Alpha1! What would you like to know about our platform?"},
+  {keys:['bye','goodbye','thanks','thank you','shukriya'],ans:"Thanks for visiting! 🙏 Don't forget to join the waitlist. See you at launch! 🚀"},
+  {keys:['how does','kaise','work','kaam kaise'],ans:"Alpha1 combines multiple AI models with an intuitive interface. Just describe what you want — no code needed! ⚡"},
+  {keys:['mobile','app','ios','android'],ans:"Mobile apps are coming post-launch! Right now Alpha1 is web-based and fully mobile-responsive. 📱"},
+  {keys:['team','employees','company','startup'],ans:"Alpha1 is an early-stage startup led by Atharv Sahu. Small team, big vision — building the future of AI. 💪"},
+];
+const defaults = [
+  "Great question! We're still building out our docs. Join the waitlist and we'll keep you updated. 🚀",
+  "Hmm, I don't have that answer yet! Try asking about features, pricing, or our launch. 💡",
+  "That's a bit outside my knowledge for now! Check back after launch for full support. 🔥",
+  "Not sure about that yet — but our team will be! Join the waitlist to stay in the loop. ⚡"
+];
+const quickQs = ["What is Alpha1?","When launching?","Is it free?","Who built this?","Features?"];
+
+let chatOpen = false, chatStarted = false;
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-window').classList.toggle('open', chatOpen);
+  if(chatOpen && !chatStarted){
+    chatStarted = true;
+    setTimeout(() => { addMsg('bot',"Hey! 👋 I'm Alpha1's support bot. Ask me anything about the platform!"); renderQBtns(); }, 200);
+  }
+}
+function renderQBtns() {
+  const c = document.getElementById('quick-btns'); c.innerHTML='';
+  quickQs.forEach(q => { const b=document.createElement('button'); b.className='qbtn'; b.textContent=q; b.onclick=()=>{handleMsg(q);c.innerHTML='';};c.appendChild(b);});
+}
+function addMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const d = document.createElement('div'); d.className='msg '+role; d.textContent=text;
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+}
+function handleMsg(text) {
+  addMsg('user', text);
+  const lower = text.toLowerCase();
+  const msgs = document.getElementById('chat-messages');
+  const t = document.createElement('div'); t.className='msg bot typing'; t.id='typing'; t.textContent='...';
+  msgs.appendChild(t); msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(() => {
+    document.getElementById('typing')?.remove();
+    let reply = null;
+    for(const f of faqs){ if(f.keys.some(k=>lower.includes(k))){reply=f.ans;break;} }
+    if(!reply) reply = defaults[Math.floor(Math.random()*defaults.length)];
+    addMsg('bot', reply);
+  }, 500 + Math.random()*500);
+}
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim(); if(!text) return;
+  inp.value = ''; handleMsg(text);
+}
+</script>
+</body>
+</html>
